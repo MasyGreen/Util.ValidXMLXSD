@@ -1,0 +1,13 @@
+.git/
+.idea/
+Include/
+Lib/
+Scripts/
+pyvenv.cfg
+__pycache__
+build
+dist
+*.spec
+*.xml
+*.xsd
+*.log
