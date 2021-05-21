@@ -1,9 +1,9 @@
 import datetime
 import os
+import codecs
 
 import keyboard
 from lxml import etree
-
 
 class bcolors:
     HEADER = '\033[95m'
@@ -17,21 +17,31 @@ class bcolors:
 
 
 def writelog(logfile, message):
-    with open(logfile, 'a') as f:
-        f.write(f"{datetime.datetime.now()}: {message}\n")
-
+    with codecs.open(logfile, 'a', encoding='utf-8') as f:
+        f.write(f"{message}\n")
 
 def validate(xsdfile, xmlfile, logfile):
-    print(f'{bcolors.OKBLUE}Process: {xsdfile=}; {xmlfile=}')
+    msg = f'Process: {datetime.datetime.now()}\n{xmlfile=}\n{xsdfile=}\n'
+    print(f'{bcolors.OKBLUE}{msg}')
+    writelog(logfile, msg)
+
     xmlschema_doc = etree.parse(xsdfile)
     xmlschema = etree.XMLSchema(xmlschema_doc)
     doc = etree.parse(xmlfile)
     if xmlschema.validate(doc):
-        print(f'{bcolors.OKGREEN}OK')
+        msg = 'OK'
+        print(f'{bcolors.OKGREEN}{msg}')
+        writelog(logfile, msg)
     else:
-        log = xmlschema.error_log
-        writelog(logfile, log)
-        print(f'{bcolors.FAIL}Error: {log.last_error}')
+        log = str(xmlschema.error_log)
+        msg = f'Error:'
+        print(f"{bcolors.FAIL}{msg}")
+        writelog(logfile, msg)
+        for error in xmlschema.error_log:
+            msg = "ERROR ON LINE %s: %s" % (error.line, error.message.encode("utf-8"))
+            print(f"{bcolors.FAIL}{msg}")
+            writelog(logfile, msg)
+        writelog(logfile, '______________________________________________\n\n')
 
 
 def main():
@@ -44,12 +54,13 @@ def main():
             if os.path.exists(schema_file):
                 print(f"{bcolors.HEADER}{bcolors.BOLD}File: {in_file}")
                 validate(schema_file, xml_file, log_file)
-                print(f"{bcolors.OKBLUE}______________________________")
+                print(f"{bcolors.OKBLUE}______________________________\n")
 
 
 if __name__ == "__main__":
-    print(f"{bcolors.HEADER}Last update: Cherepanov Maxim masygreen@gmail.com (c), 05.2021")
-    print(f"{bcolors.HEADER}Find file the same name in current folder (*.xml; *.xsd)")
+    print(f"{bcolors.HEADER}{bcolors.BOLD}Last update: Cherepanov Maxim masygreen@gmail.com (c), 05.2021")
+    print(f"{bcolors.HEADER}{bcolors.BOLD}Find file the same name in current folder (*.xml; *.xsd)")
+    print(f"{bcolors.OKBLUE}______________________________")
     cur_dir = os.getcwd()
     main()
     print(f'{bcolors.HEADER}\n\n*All Process done\n*Press Space to Exit... It the longest shortcut \_(o0)_\...')
