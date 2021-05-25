@@ -42,7 +42,7 @@ def writelogfile(logfile, message):
 
 
 def validate(xsdfile, xmlfile, logfile):
-    msg = f'Process: {datetime.datetime.now()}\n' \
+    msg = f'Process:\n' \
           f'{xsdfile=}\n' \
           f'{xmlfile=}' \
           f'; Size={round(get_file_size(xmlfile, size_unit.KB), 2)}KB' \
@@ -91,9 +91,9 @@ def main():
             schema_file = f'{cur_dir}\\{in_filename}.xsd'
             log_file = f'{cur_dir}\\{in_filename}.log'
             if os.path.exists(schema_file):
-                print(f"{Fore.YELLOW}==Start: '{in_file}' ==", file=stream)
+                print(f"{Fore.YELLOW}==Start: '{in_file}' == {datetime.datetime.now()}", file=stream)
                 validate(schema_file, xml_file, log_file)
-                print(f"{Fore.YELLOW}==End: '{in_file}' ====", file=stream)
+                print(f"{Fore.YELLOW}==End: '{in_file}' ==== {datetime.datetime.now()}", file=stream)
                 print(Style.RESET_ALL, file=stream)
 
 
