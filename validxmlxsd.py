@@ -56,10 +56,13 @@ def validate(xsdfile, xmlfile, logfile):
         doc = etree.parse(xmlfile)
         strquery = f'count({xpath_count})'
         try:
-            result = f"{Fore.LIGHTBLUE_EX}Count {xpath_count}: {doc.xpath(strquery)}"
-            print(f'{Fore.GREEN}{result}', file=stream)
+            msg = f"Count ({xpath_count}): {int(doc.xpath(strquery))}"
+            print(f'{Fore.LIGHTBLUE_EX}{msg}', file=stream)
+            writelogfile(logfile, msg)
         except Exception as ex:
-            print(f'{Fore.RED}Ошибка запроса Count: {xpath_count} {ex}', file=stream)
+            msg = f'Ошибка запроса Count ({xpath_count}): {ex}'
+            print(f'{Fore.RED}{msg}', file=stream)
+            writelogfile(logfile, msg)
 
         if xmlschema.validate(doc):
             msg = 'OK'
@@ -73,12 +76,11 @@ def validate(xsdfile, xmlfile, logfile):
                 msg = "ERROR ON LINE %s: %s" % (error.line, error.message.encode("utf-8"))
                 print(f'{Fore.RED}{msg}', file=stream)
                 writelogfile(logfile, msg)
-            writelogfile(logfile, '______________________________________________\n\n')
     except Exception as ex:
         msg = f'Error file struct:\n{ex}'
         print(f'{Fore.RED}{msg}', file=stream)
         writelogfile(logfile, msg)
-
+    writelogfile(logfile, '______________________________________________\n\n')
 
 def main():
     print(Style.RESET_ALL, file=stream)
