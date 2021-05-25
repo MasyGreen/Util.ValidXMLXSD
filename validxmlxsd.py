@@ -42,8 +42,7 @@ def writelogfile(logfile, message):
 
 
 def validate(xsdfile, xmlfile, logfile):
-    msg = f'Process:\n' \
-          f'{xsdfile=}\n' \
+    msg = f'{xsdfile=}\n' \
           f'{xmlfile=}' \
           f'; Size={round(get_file_size(xmlfile, size_unit.KB), 2)}KB' \
           f'; Size={round(get_file_size(xmlfile, size_unit.MB), 2)}MB'
@@ -80,7 +79,7 @@ def validate(xsdfile, xmlfile, logfile):
         msg = f'Error file struct:\n{ex}'
         print(f'{Fore.RED}{msg}', file=stream)
         writelogfile(logfile, msg)
-    writelogfile(logfile, '______________________________________________\n\n')
+
 
 def main():
     print(Style.RESET_ALL, file=stream)
@@ -91,10 +90,15 @@ def main():
             schema_file = f'{cur_dir}\\{in_filename}.xsd'
             log_file = f'{cur_dir}\\{in_filename}.log'
             if os.path.exists(schema_file):
-                print(f"{Fore.YELLOW}==Start: '{in_file}' == {datetime.datetime.now()}", file=stream)
+                msg = f"==Start: '{in_file}' == {datetime.datetime.now()}"
+                print(f"{Fore.YELLOW}{msg}", file=stream)
+                writelogfile(log_file, msg)
                 validate(schema_file, xml_file, log_file)
-                print(f"{Fore.YELLOW}==End: '{in_file}' ==== {datetime.datetime.now()}", file=stream)
+                msg = f"==End: '{in_file}' ==== {datetime.datetime.now()}"
+                print(f"{Fore.YELLOW}{msg}", file=stream)
+                writelogfile(log_file, msg)
                 print(Style.RESET_ALL, file=stream)
+    writelogfile(log_file, '______________________________________________\n\n')
 
 
 def readconfigfile(filename):
