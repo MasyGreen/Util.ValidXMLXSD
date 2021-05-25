@@ -11,3 +11,4 @@ dist
 *.xml
 *.xsd
 *.log
+config.ini
