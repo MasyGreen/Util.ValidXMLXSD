@@ -72,7 +72,7 @@ def validate(xsdfile, xmlfile, logfile):
             print(f"{Fore.RED}{msg}", file=stream)
             writelogfile(logfile, msg)
             for error in xmlschema.error_log:
-                msg = "ERROR ON LINE %s: %s" % (error.line, error.message.encode("utf-8"))
+                msg = "ERROR ON LINE %s: %s" % (error.line, error.message)#.decode('utf-8') .encode("utf-8")
                 print(f'{Fore.RED}{msg}', file=stream)
                 writelogfile(logfile, msg)
     except Exception as ex:
