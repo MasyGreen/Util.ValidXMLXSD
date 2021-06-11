@@ -65,7 +65,7 @@ def main():
                 savepretty(xml_file, xml_filepretty)
             except Exception as ex:
                 print(f'{Fore.RED}{ex}', file=stream)
-                writelogfile(log_file, msg)
+                writelogfile(log_file, ex)
 
             msg = f"==End: '{xml_filepretty}'; Size={round(get_file_size(xml_filepretty, size_unit.KB), 2)}{size_unit.KB.name}; {datetime.datetime.now()}"
             print(f"{Fore.YELLOW}{msg}\n", file=stream)
