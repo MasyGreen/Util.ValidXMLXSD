@@ -31,8 +31,10 @@ def convert_unit(size_in_bytes, unit):
 
 
 def get_file_size(file_name, size_type=size_unit.BYTES):
+    size = 0
     """ Get file in size in given unit like KB, MB or GB"""
-    size = os.path.getsize(file_name)
+    if os.path.exists(file_name):
+        size = os.path.getsize(file_name)
     return convert_unit(size, size_type)
 
 
@@ -44,8 +46,8 @@ def writelogfile(logfile, message):
 def validate(xsdfile, xmlfile, logfile):
     msg = f'{xsdfile=}\n' \
           f'{xmlfile=}' \
-          f'; Size={round(get_file_size(xmlfile, size_unit.KB), 2)}KB' \
-          f'; Size={round(get_file_size(xmlfile, size_unit.MB), 2)}MB'
+          f'; Size={round(get_file_size(xmlfile, size_unit.KB), 2)}{size_unit.KB.name}' \
+          f'; Size={round(get_file_size(xmlfile, size_unit.MB), 2)}{size_unit.MB.name}'
     print(f'{Fore.LIGHTBLUE_EX}{msg}', file=stream)
     writelogfile(logfile, msg)
 

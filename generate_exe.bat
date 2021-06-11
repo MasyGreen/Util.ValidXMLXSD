@@ -1,1 +1,0 @@
-pyinstaller -F -i "Icon.ico" validxmlxsd.py
