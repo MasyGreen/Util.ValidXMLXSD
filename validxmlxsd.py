@@ -55,13 +55,13 @@ def validate(xsdfile, xmlfile, logfile):
         xmlschema_doc = etree.parse(xsdfile)
         xmlschema = etree.XMLSchema(xmlschema_doc)
         doc = etree.parse(xmlfile)
-        strquery = f'count({xpath_count})'
+        strquery = f'count({xpath_str})'
         try:
-            msg = f"Count ({xpath_count}): {int(doc.xpath(strquery))}"
+            msg = f"Count ({xpath_str}): {int(doc.xpath(strquery))}"
             print(f'{Fore.LIGHTBLUE_EX}{msg}', file=stream)
             writelogfile(logfile, msg)
         except Exception as ex:
-            msg = f'Ошибка запроса Count ({xpath_count}): {ex}'
+            msg = f'Ошибка запроса Count ({xpath_str}): {ex}'
             print(f'{Fore.RED}{msg}', file=stream)
             writelogfile(logfile, msg)
 
@@ -109,7 +109,7 @@ def readconfigfile(filename):
             config = configparser.ConfigParser()
             config.read(filename)
             config.sections()
-            global xpath_count
+            global xpath_str
             xpath_count = str(config.get("Settings", "xpath"))
         except Exception as ex:
             print(f'{Fore.RED}{ex}', file=stream)
@@ -132,9 +132,9 @@ if __name__ == "__main__":
     print(f"{Fore.CYAN}Find file the same name in current folder (*.xml; *.xsd)", file=stream)
 
     _config_file = f'{cur_dir}\\config.ini'
-    xpath_count = f'.//item/item'
+    xpath_str = f'.//item/item'
     if readconfigfile(_config_file):
-        print(f"{Fore.CYAN}{xpath_count=}", file=stream)
+        print(f"{Fore.CYAN}{xpath_str=}", file=stream)
 
     print(f"{Fore.CYAN}======================PROCESS==================", file=stream)
 
