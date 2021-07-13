@@ -1,14 +1,13 @@
 import codecs
-import configparser
 import datetime
-import os
+import configparser
 import enum
+import os
+import sys
+import xml.etree.ElementTree as ET
 
 import keyboard
-import sys
-from colorama import Fore, Back, Style, init, AnsiToWin32
-
-import xml.etree.ElementTree as ET
+from colorama import Fore, Style, init, AnsiToWin32
 
 
 # Enum for size units
@@ -44,29 +43,84 @@ def writelogfile(logfile, message):
         f.write(f"{message}\n")
 
 
+def generatesubroot(xpath_str, updroot, log_file):
+    if createtree == 1:
+        split_xpath = xpath_str.split('/')
+        maxcount_split = len(split_xpath)
+
+        msg = f'Генерация структуры: {split_xpath=}; {maxcount_split=}'
+        print(f'{Fore.YELLOW}{msg}', file=stream)
+        writelogfile(log_file, msg)
+
+        if maxcount_split > 2:
+            ind = 0
+            for _item in split_xpath:
+                ind = ind + 1
+                if _item != '.' and _item != '' and ind <= maxcount_split - 1:
+                    # поиск атрибутов
+                    if _item.find('[') == -1:
+                        updroot = ET.SubElement(updroot, _item)
+                    else:
+                        attr_split = _item.split('[')
+                        msg = f'Структура + атрибуты: {attr_split=}'
+                        print(f'{Fore.YELLOW}{msg}', file=stream)
+                        writelogfile(log_file, msg)
+
+                        if len(attr_split) == 2:
+                            updroot = ET.SubElement(updroot, attr_split[0])
+                            attr_s = attr_split[1].replace('@', '').replace(']', '').replace('\"', '')
+                            attr_l = attr_s.split('=')
+
+                            msg = f'Атрибуты: {attr_l=}'
+                            print(f'{Fore.YELLOW}{msg}', file=stream)
+                            writelogfile(log_file, msg)
+                            updroot.set(attr_l[0], attr_l[1])
+
+                    msg = f'Step {ind}: [{_item}]'
+                    print(f'{Fore.YELLOW}{msg}', file=stream)
+                    writelogfile(log_file, msg)
+
+    return updroot
+
+
 def main():
     print(f'XPath: {xpath_str=}; Начальный эл.: {ind_start=}; Последний эл.: {ind_end=}', file=stream)
     print(Style.RESET_ALL, file=stream)
 
     for in_file in os.listdir(cur_dir):
-        if os.path.isfile(in_file) and in_file.endswith(".xml") and not in_file.endswith("_part.xml"):
+        if os.path.isfile(in_file) and in_file.endswith(".xml") and not in_file.endswith("_result.xml"):
             in_filename = in_file.split('.')[0]
             xml_file = f'{cur_dir}\\{in_filename}.xml'
-            log_file = f'{cur_dir}\\{in_filename}_part.xml'
-            print(f'{Fore.CYAN}Обработка: {xml_file=}', file=stream)
+            result_file = f'{cur_dir}\\{in_filename}_result.xml'
+            log_file = f'{cur_dir}\\{in_filename}.log'
+
+            msg = f"==Start: '{xml_file}'; Size={round(get_file_size(xml_file, size_unit.KB), 2)}{size_unit.KB.name}; {datetime.datetime.now()}"
+            print(f'{Fore.CYAN}{msg}', file=stream)
+            writelogfile(log_file, msg)
+
             tree = ET.parse(xml_file)
             root = tree.getroot()
             _items = root.findall(xpath_str)
+
+            msg = f"Кол-во элементов: {len(_items)=}; {datetime.datetime.now()}"
+            print(f'{Fore.CYAN}{msg}', file=stream)
+            writelogfile(log_file, msg)
+
             curind = 0
-            newroot = ET.Element("root")
+            newroot = ET.Element('root')
+            subroot = generatesubroot(xpath_str, newroot, log_file)
             for _item in _items:
                 curind = curind + 1
                 if curind >= ind_start and curind <= ind_end:
-                    newroot.append(_item)
-                    print(f'{Fore.GREEN}Result {curind}: {_item.attrib}', file=stream)
+                    subroot.append(_item)
+                    # print(f'{Fore.GREEN}Result {curind}: {_item.attrib}', file=stream)
 
             tree = ET.ElementTree(newroot)
-            tree.write(log_file,"utf-8")
+            tree.write(result_file, xml_declaration=True, method="xml", encoding="utf-8")
+
+            msg = f"==End: '{result_file}'; Size={round(get_file_size(result_file, size_unit.KB), 2)}{size_unit.KB.name}; {datetime.datetime.now()}"
+            print(f'{Fore.CYAN}{msg}', file=stream)
+            writelogfile(log_file, msg)
 
 def readconfigfile(filename):
     if os.path.exists(filename):
@@ -85,6 +139,10 @@ def readconfigfile(filename):
             varstr = str(config.get("Settings", "indend"))
             ind_end = int(varstr)
 
+            global createtree
+            varstr = str(config.get("Settings", "createtree"))
+            createtree = int(varstr)
+
         except Exception as ex:
             print(f'{Fore.RED}{ex}; Delete file:{filename}', file=stream)
             xpath_str = f'.//item/item'
@@ -93,10 +151,12 @@ def readconfigfile(filename):
     else:
         config = configparser.ConfigParser()
         config.add_section("Settings")
-        config.set('Settings', '; comment here', './/item[@itemid="kated"]/item')
+        config.set('Settings', '; Шаблон xpath', './/item[@itemid="kated"]/item')
         config.set("Settings", "xpath", f'.//item/item')
         config.set("Settings", "indstart", f'0')
         config.set("Settings", "indend", f'0')
+        config.set('Settings', '; Шаблон createtree', '0 - False, 1 - True')
+        config.set("Settings", "createtree", f'0')
         with open(filename, "w") as f:
             config.write(f)
 

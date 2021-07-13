@@ -52,10 +52,10 @@ def savepretty(infile, outfile):
 def main():
     print(Style.RESET_ALL, file=stream)
     for in_file in os.listdir(cur_dir):
-        if os.path.isfile(in_file) and in_file.endswith(".xml"):
+        if os.path.isfile(in_file) and in_file.endswith(".xml") and not in_file.endswith("_result.xml"):
             in_filename = in_file.split('.')[0]
             xml_file = f'{cur_dir}\\{in_filename}.xml'
-            xml_filepretty = f'{cur_dir}\\_{in_filename}.xml'
+            xml_filepretty = f'{cur_dir}\\{in_filename}_result.xml'
             log_file = f'{cur_dir}\\{in_filename}.log'
 
             msg = f"==Start: '{xml_file}'; Size={round(get_file_size(xml_file, size_unit.KB), 2)}{size_unit.KB.name}; {datetime.datetime.now()}"
