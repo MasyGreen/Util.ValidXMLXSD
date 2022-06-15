@@ -90,9 +90,9 @@ def main():
     for in_file in os.listdir(cur_dir):
         if os.path.isfile(in_file) and in_file.endswith(".xml") and not in_file.endswith("_result.xml"):
             in_filename = in_file.split('.')[0]
-            xml_file = f'{cur_dir}\\{in_filename}.xml'
-            result_file = f'{cur_dir}\\{in_filename}_result.xml'
-            log_file = f'{cur_dir}\\{in_filename}.log'
+            xml_file = os.path.join(cur_dir, f'{in_filename}.xml')
+            result_file = os.path.join(cur_dir, f'{in_filename}_result.xml')
+            log_file = os.path.join(cur_dir, f'{in_filename}.log')
 
             msg = f"==Start: '{xml_file}'; Size={round(get_file_size(xml_file, size_unit.KB), 2)}{size_unit.KB.name}; {datetime.datetime.now()}"
             print(f'{Fore.CYAN}{msg}', file=stream)
@@ -106,7 +106,7 @@ def main():
             print(f'{Fore.CYAN}{msg}', file=stream)
             writelogfile(log_file, msg)
 
-            curind = 0
+            curind: int = 0
             newroot = ET.Element('root')
             subroot = generatesubroot(xpath_str, newroot, log_file)
             for _item in _items:
@@ -121,6 +121,7 @@ def main():
             msg = f"==End: '{result_file}'; Size={round(get_file_size(result_file, size_unit.KB), 2)}{size_unit.KB.name}; {datetime.datetime.now()}"
             print(f'{Fore.CYAN}{msg}', file=stream)
             writelogfile(log_file, msg)
+
 
 def readconfigfile(filename):
     if os.path.exists(filename):
@@ -153,6 +154,7 @@ def readconfigfile(filename):
         config.add_section("Settings")
         config.set('Settings', '; Шаблон xpath', './/item[@itemid="kated"]/item')
         config.set("Settings", "xpath", f'.//item/item')
+        config.set('Settings', '; Диапазон', 'с 1 по ...')
         config.set("Settings", "indstart", f'0')
         config.set("Settings", "indend", f'0')
         config.set('Settings', '; Шаблон createtree', '0 - False, 1 - True')
@@ -166,10 +168,10 @@ if __name__ == "__main__":
     stream = AnsiToWin32(sys.stderr).stream
     cur_dir = os.getcwd()
 
-    # print(f"{Fore.CYAN}Last update: Cherepanov Maxim masygreen@gmail.com (c), 06.2021", file=stream)
-    # print(f"{Fore.CYAN}Get some count element ftom *.xml;", file=stream)
+    print(f"{Fore.CYAN}Last update: Cherepanov Maxim masygreen@gmail.com (c), 06.2021", file=stream)
+    print(f"{Fore.CYAN}Get some count element from *.xml;", file=stream)
 
-    _config_file = f'{cur_dir}\\config.ini'
+    _config_file = os.path.join(cur_dir, "config.ini")
     xpath_str = f'.//item/item'
     ind_start = 1
     ind_end = 1
@@ -190,6 +192,7 @@ if __name__ == "__main__":
         ind_start = 1
         ind_end = 1
 
+    print(f"{Fore.CYAN}Отбор с {ind_start} по {ind_end} ;", file=stream)
     print(f"{Fore.CYAN}======================PROCESS==================", file=stream)
 
     main()

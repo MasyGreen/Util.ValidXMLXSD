@@ -74,7 +74,7 @@ def validate(xsdfile, xmlfile, logfile):
             print(f"{Fore.RED}{msg}", file=stream)
             writelogfile(logfile, msg)
             for error in xmlschema.error_log:
-                msg = "ERROR ON LINE %s: %s" % (error.line, error.message)#.decode('utf-8') .encode("utf-8")
+                msg = "ERROR ON LINE %s: %s" % (error.line, error.message)  # .decode('utf-8') .encode("utf-8")
                 print(f'{Fore.RED}{msg}', file=stream)
                 writelogfile(logfile, msg)
     except Exception as ex:
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     print(f"{Fore.CYAN}Last update: Cherepanov Maxim masygreen@gmail.com (c), 05.2021", file=stream)
     print(f"{Fore.CYAN}Find file the same name in current folder (*.xml; *.xsd)", file=stream)
 
-    _config_file = f'{cur_dir}\\config.ini'
+    _config_file = os.path.join(cur_dir, "config.ini")
     xpath_str = f'.//item/item'
     if readconfigfile(_config_file):
         print(f"{Fore.CYAN}{xpath_str=}", file=stream)
